@@ -85,7 +85,7 @@ String expression = null;
 					osAdd = 0;
 					
 				}
-				else if (((expr.charAt(offSet-1) == '/') || (expr.charAt(offSet-1) == '*'))&&(splitOn=='-'))
+				else if (((expr.charAt(offSet-1) == 'r') || (expr.charAt(offSet-1) == '^') || (expr.charAt(offSet-1) == '/') || (expr.charAt(offSet-1) == '*'))&&(splitOn=='-'))
 				{
 					System.out.println("Ignoring neg with preceeding mult/div");
 					//toAdd.add("0");
@@ -119,7 +119,7 @@ String expression = null;
 				osAdd = 0;
 				
 			}
-			else if ((expr.charAt(offSet-1) == '/') || (expr.charAt(offSet-1) == '*'))
+			else if (((expr.charAt(offSet-1) == 'r') || (expr.charAt(offSet-1) == '^') || (expr.charAt(offSet-1) == '/') || (expr.charAt(offSet-1) == '*')) && (splitOn =='-'))
 			{
 				System.out.println("Ignoring neg with preceeding mult/div");
 				osAdd = -1;
@@ -184,25 +184,6 @@ String expression = null;
 		}
 		//--------------------------------------
 		
-		//Exponent---------------------------------
-		//String[] toMult = expr.split("\\*(?![^(]*\\))");
-		/*
-		List<String> toExp = mySplit(expr, '^');
-		if (toExp.size() > 1)
-		{
-			double retVal = evalExpr(toExp.get(0));
-			//double retVal = 1;
-			for(int i =1; i < toExp.size(); i++)
-			{
-				//retVal *= Double.parseDouble(toAdd[i]);
-				System.out.println(toExp.get(i));
-				retVal = Math.pow(retVal, evalExpr(toExp.get(i)));
-			}
-			return retVal;
-		}
-		*/
-		//-----------------------------------------
-		
 			try
 			{
 				System.out.println(expr);
@@ -219,25 +200,6 @@ String expression = null;
 			}
 			catch (NumberFormatException e)
 			{
-				
-				//Exponent---------------------------------
-				//String[] toMult = expr.split("\\*(?![^(]*\\))");
-				/*
-				List<String> toExp = mySplit(expr, '^');
-				if (toExp.size() > 1)
-				{
-					double retVal = evalExpr(toExp.get(0));
-					//double retVal = 1;
-					for(int i =1; i < toExp.size(); i++)
-					{
-						//retVal *= Double.parseDouble(toAdd[i]);
-						System.out.println(toExp.get(i));
-						retVal = Math.pow(retVal, evalExpr(toExp.get(i)));
-					}
-					return retVal;
-				}
-				*/
-				//-----------------------------------------
 				
 				//Multiply---------------------------------
 				//String[] toMult = expr.split("\\*(?![^(]*\\))");
@@ -292,8 +254,28 @@ String expression = null;
 					for(int i =1; i < toExp.size(); i++)
 					{
 						//retVal *= Double.parseDouble(toAdd[i]);
-						System.out.println(toExp.get(i));
+						System.out.println("power is " + toExp.get(i));
+						System.out.println(retVal + " raised to the " + evalExpr(toExp.get(i)));
 						retVal = Math.pow(retVal, evalExpr(toExp.get(i)));
+					}
+					return retVal;
+				}
+				
+				//-----------------------------------------
+				
+				//Root---------------------------------
+				//String[] toMult = expr.split("\\*(?![^(]*\\))");
+				
+				List<String> toRoot = mySplit(expr, 'r');
+				if (toRoot.size() > 1)
+				{
+					double retVal = evalExpr(toRoot.get(0));
+					//double retVal = 1;
+					for(int i =1; i < toRoot.size(); i++)
+					{
+						//retVal *= Double.parseDouble(toAdd[i]);
+						System.out.println(toRoot.get(i));
+						retVal = Math.pow(retVal, (-1*evalExpr(toRoot.get(i))));
 					}
 					return retVal;
 				}
