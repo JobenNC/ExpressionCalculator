@@ -184,13 +184,60 @@ String expression = null;
 		}
 		//--------------------------------------
 		
+		//Exponent---------------------------------
+		//String[] toMult = expr.split("\\*(?![^(]*\\))");
+		/*
+		List<String> toExp = mySplit(expr, '^');
+		if (toExp.size() > 1)
+		{
+			double retVal = evalExpr(toExp.get(0));
+			//double retVal = 1;
+			for(int i =1; i < toExp.size(); i++)
+			{
+				//retVal *= Double.parseDouble(toAdd[i]);
+				System.out.println(toExp.get(i));
+				retVal = Math.pow(retVal, evalExpr(toExp.get(i)));
+			}
+			return retVal;
+		}
+		*/
+		//-----------------------------------------
+		
 			try
 			{
-				double val = Double.parseDouble(expr);
-				return val;
+				System.out.println(expr);
+				if (expr.indexOf("^")!= -1)
+				{
+					throw new NumberFormatException("Found exp");
+				}
+				else
+				{
+					double val = Double.parseDouble(expr);
+					System.out.println("Parsed "+val);
+					return val;
+				}
 			}
 			catch (NumberFormatException e)
 			{
+				
+				//Exponent---------------------------------
+				//String[] toMult = expr.split("\\*(?![^(]*\\))");
+				/*
+				List<String> toExp = mySplit(expr, '^');
+				if (toExp.size() > 1)
+				{
+					double retVal = evalExpr(toExp.get(0));
+					//double retVal = 1;
+					for(int i =1; i < toExp.size(); i++)
+					{
+						//retVal *= Double.parseDouble(toAdd[i]);
+						System.out.println(toExp.get(i));
+						retVal = Math.pow(retVal, evalExpr(toExp.get(i)));
+					}
+					return retVal;
+				}
+				*/
+				//-----------------------------------------
 				
 				//Multiply---------------------------------
 				//String[] toMult = expr.split("\\*(?![^(]*\\))");
@@ -232,6 +279,25 @@ String expression = null;
 					}
 					return retVal;
 				}
+				//-----------------------------------------
+				
+				//Exponent---------------------------------
+				//String[] toMult = expr.split("\\*(?![^(]*\\))");
+				
+				List<String> toExp = mySplit(expr, '^');
+				if (toExp.size() > 1)
+				{
+					double retVal = evalExpr(toExp.get(0));
+					//double retVal = 1;
+					for(int i =1; i < toExp.size(); i++)
+					{
+						//retVal *= Double.parseDouble(toAdd[i]);
+						System.out.println(toExp.get(i));
+						retVal = Math.pow(retVal, evalExpr(toExp.get(i)));
+					}
+					return retVal;
+				}
+				
 				//-----------------------------------------
 				
 				//Parentheses----------------------------
