@@ -49,6 +49,8 @@ String expression = null;
 		int rightCount = 0;
 		int j = 0;
 		boolean added = false;
+		int osAdd = 0;
+		boolean unaryFlag = false;
 				
 		for (int i = 0; i < expr.length(); i++)
 		{
@@ -71,12 +73,35 @@ String expression = null;
 					}
 				}
 			}
-			if (expr.charAt(offSet)==splitOn)
+			if ((expr.charAt(offSet)==splitOn))
 			{
 				added = true;
+				
+				//handle unary neg
+				if ((expr.substring(oldOffSet+1, offSet).length()==0) && (splitOn == '-'))
+				{
+					System.out.println("Handling unary neg");
+					toAdd.add("0");
+					osAdd = 0;
+					
+				}
+				else if (((expr.charAt(offSet-1) == '/') || (expr.charAt(offSet-1) == '*'))&&(splitOn=='-'))
+				{
+					System.out.println("Ignoring neg with preceeding mult/div");
+					//toAdd.add("0");
+					osAdd = -1;
+					added=false;
+					//Do nothing, number will be negated when parsed to double
+				}
+				else
+				{
+					toAdd.add(expr.substring(oldOffSet+1, offSet+osAdd));
+					osAdd = 0;
+				}
+				
 				System.out.println("old is: "+ oldOffSet+" offset is:" + offSet);
-				System.out.println("putting " + expr.substring(oldOffSet+1, offSet));
-				toAdd.add(expr.substring(oldOffSet+1, offSet));
+				System.out.println("putting " + expr.substring(oldOffSet+1, offSet+osAdd));
+				System.out.println(expr.substring(oldOffSet+1, offSet).length());
 				
 				oldOffSet = offSet;
 			}
@@ -85,10 +110,29 @@ String expression = null;
 				
 		if (added)
 		{
+			
+			//handle unary neg
+			if ((expr.substring(oldOffSet+1, offSet).length()==0) && (splitOn == '-'))
+			{
+				System.out.println("Handling unary neg");
+				toAdd.add("0");
+				osAdd = 0;
+				
+			}
+			else if ((expr.charAt(offSet-1) == '/') || (expr.charAt(offSet-1) == '*'))
+			{
+				System.out.println("Ignoring neg with preceeding mult/div");
+				osAdd = -1;
+				//Do nothing, number will be negated when parsed to double
+			}
+			else
+			{
+				toAdd.add(expr.substring(oldOffSet+1, offSet+osAdd));
+				osAdd = 0;
+			}
 			System.out.println("In last iter");
 			System.out.println("old is: "+ oldOffSet);
-			System.out.println("putting " + expr.substring(oldOffSet+1, expr.length()));
-			toAdd.add(expr.substring(oldOffSet+1, expr.length()));
+			System.out.println("putting " + expr.substring(oldOffSet+1, expr.length()+osAdd));
 		}
 		return toAdd;
 		//-----------------------------
@@ -190,50 +234,13 @@ String expression = null;
 				}
 				//-----------------------------------------
 				
-				//Parentheses--------------------
+				//Parentheses----------------------------
 				if (expr.indexOf("(") == 0)
 				{
 					System.out.println("Detected Parens");
 					return evalExpr(expr.substring(1, expr.length()-1));
-					
-					
-					//Java regex can't find closing
-					//parse
-					/*
-					int leftOffset = 0;
-					int rightOffset = 0;
-					
-					if (expr.substring(leftOffset+1).indexOf("(") != -1)
-					{
-						while(expr.substring(leftOffset+1).indexOf("(") != -1)
-						{
-							//increemnt left offset once
-							leftOffset = expr.substring(leftOffset+1).indexOf("(");
-							
-							//incrememnt right offset twice.
-							rightOffset = expr.substring(rightOffset+1).indexOf(")");
-							rightOffset = expr.substring(rightOffset+1).indexOf(")");
-						}
-					}
-					else
-					{
-						rightOffset = expr.length();
-					}
-					
-					
-					
-					System.out.println(expr);
-					System.out.println(expr.substring(1, rightOffset-1));
-					//return -666;
-					return evalExpr(expr.substring(1, rightOffset-1));
 				}
-				//-------------------------------
-			}
-			
-		//Shit didn't work
-		return -666;
-		*/
-				}
+				//---------------------------------------
 			}
 		return -666;
 	}
