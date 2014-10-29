@@ -54,6 +54,7 @@ String expression = null;
 		{
 			if (expr.charAt(offSet) == '(')
 			{
+				rightCount = 0;
 				leftCount = 1;
 				while (leftCount != rightCount)
 				{
@@ -65,6 +66,7 @@ String expression = null;
 					}
 					if(expr.charAt(offSet) == ')')
 					{
+						System.out.println("Found right, offS is " + offSet);
 						rightCount++;
 					}
 				}
@@ -83,6 +85,7 @@ String expression = null;
 				
 		if (added)
 		{
+			System.out.println("In last iter");
 			System.out.println("old is: "+ oldOffSet);
 			System.out.println("putting " + expr.substring(oldOffSet+1, expr.length()));
 			toAdd.add(expr.substring(oldOffSet+1, expr.length()));
