@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 
@@ -11,7 +13,32 @@ String expression = null;
 	}
 
 	public static void main(String[] args) {
+		
+		String i = null;
+		//Check for bad chars
+		
+		args[0] = args[0].replaceAll("x", args[1]);
+		
+		System.out.println("after repl " + args[0]);
+		
+		Pattern r = Pattern.compile("[^\\d\\+\\-\\*\\/\\^r\\(\\)]");
+		Matcher m = r.matcher(args[0]);
+		if (m.find())
+		{
+			
+			System.out.println("Bad input char");
+			System.out.println(m.groupCount());
+			i = m.group(0);
+			System.out.println(i);
+			i = m.group(1);
+			System.out.println(i);
+			i = m.group(2);
+			System.out.println(i);
+			return;
+		}
+		
 		ExpressionCalculator ep = new ExpressionCalculator(args[0]);
+		
 		double result = ep.evalExpr(ep.expression);
 		System.out.println(result);
 	}
