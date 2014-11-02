@@ -19,8 +19,6 @@ import javax.swing.SwingConstants;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 public class ExpressionCalculator implements ActionListener, Calculator {
@@ -212,9 +210,11 @@ public class ExpressionCalculator implements ActionListener, Calculator {
 		if(ae.getSource() == expTextField || ae.getSource() == forxTextField){
 			try {
 				//attempt to accumulate
+				String enteredX 		 = forxTextField.getText();
 				String enteredExpression = expTextField.getText();
 				String result			 = calculate(enteredExpression, forxTextField.getText());
 				
+				enteredExpression = enteredExpression.replace("x", enteredX);
 				logTextArea.append(newLine + enteredExpression + " = " + result);
 				// Scroll log all the way to the bottom.  
 			    logTextArea.setCaretPosition(logTextArea.getDocument().getLength());
@@ -400,7 +400,11 @@ public class ExpressionCalculator implements ActionListener, Calculator {
 			
 		}
 		
-		Expression = Expression.replace("x", x);
+		//do required replaces
+		Expression = Expression.replaceAll("R", "r");
+		Expression = Expression.replaceAll("x", x);
+		Expression = Expression.replaceAll("e", Double.toString(Math.E));
+		Expression = Expression.replaceAll("pi", Double.toString(Math.PI));
 		try{
 			return String.valueOf(evalExpr(Expression));
 		}
@@ -417,7 +421,7 @@ public class ExpressionCalculator implements ActionListener, Calculator {
 	//-------------------------------------------------------------------------------//
 	
 	//-------------------------------------------------------------------------------//
-	public List<String> mySplit(String expr, char splitOn)
+	public List<String> mySplit(String expr, char splitOn) throws IllegalArgumentException
 	{
 		//Implement own split function-------
 		List<String> toAdd = new ArrayList<String>();
@@ -452,7 +456,7 @@ public class ExpressionCalculator implements ActionListener, Calculator {
 				}
 				catch (StringIndexOutOfBoundsException e)
 				{
-					throw new IllegalArgumentException("Unmatched Parentheses");
+					throw new IllegalArgumentException("Unmatched parentheses.");
 				}
 			}
 			if ((expr.charAt(offSet)==splitOn))
@@ -498,7 +502,7 @@ public class ExpressionCalculator implements ActionListener, Calculator {
 			if ((expr.substring(oldOffSet+1, offSet).length()==0) && (splitOn == '-'))
 			{
 				//This print actually produces an exception we want
-				System.out.println(expr.charAt(oldOffSet+1));
+				//System.out.println(expr.charAt(oldOffSet+1));
 				//System.out.println("Handling unary neg");
 				toAdd.add("0");
 				osAdd = 0;
@@ -526,7 +530,7 @@ public class ExpressionCalculator implements ActionListener, Calculator {
 	//-------------------------------------------------------------------------------//
 
 	//-------------------------------------------------------------------------------//
-	public double evalExpr(String expr)
+	public double evalExpr(String expr) throws IllegalArgumentException
 	{
 		
 		//-----------------------Addition
@@ -579,7 +583,7 @@ public class ExpressionCalculator implements ActionListener, Calculator {
 				//System.out.println("Trying Double parse");
 				if (expr.indexOf("^")!= -1)
 				{
-					throw new NumberFormatException("Found exp");
+					throw new NumberFormatException("Found exp.");
 				}
 				else
 				{
@@ -633,6 +637,25 @@ public class ExpressionCalculator implements ActionListener, Calculator {
 				}
 				//-----------------------------------------
 				
+				//Root---------------------------------
+				//String[] toMult = expr.split("\\*(?![^(]*\\))");
+				
+				List<String> toRoot = mySplit(expr, 'r');
+				if (toRoot.size() > 1)
+				{
+					double retVal = evalExpr(toRoot.get(0));
+					//double retVal = 1;
+					for(int i =1; i < toRoot.size(); i++)
+					{
+						//retVal *= Double.parseDouble(toAdd[i]);
+						//System.out.println(toRoot.get(i));
+						retVal = Math.pow(retVal, (1/evalExpr(toRoot.get(i))));
+					}
+					return retVal;
+				}
+				
+				//-----------------------------------------
+				
 				//Exponent---------------------------------
 				//String[] toMult = expr.split("\\*(?![^(]*\\))");
 				
@@ -647,25 +670,6 @@ public class ExpressionCalculator implements ActionListener, Calculator {
 						//System.out.println("power is " + toExp.get(i));
 						//System.out.println(retVal + " raised to the " + evalExpr(toExp.get(i)));
 						retVal = Math.pow(retVal, evalExpr(toExp.get(i)));
-					}
-					return retVal;
-				}
-				
-				//-----------------------------------------
-				
-				//Root---------------------------------
-				//String[] toMult = expr.split("\\*(?![^(]*\\))");
-				
-				List<String> toRoot = mySplit(expr, 'r');
-				if (toRoot.size() > 1)
-				{
-					double retVal = evalExpr(toRoot.get(0));
-					//double retVal = 1;
-					for(int i =1; i < toRoot.size(); i++)
-					{
-						//retVal *= Double.parseDouble(toAdd[i]);
-						//System.out.println(toRoot.get(i));
-						retVal = Math.pow(retVal, (1/evalExpr(toRoot.get(i))));
 					}
 					return retVal;
 				}
@@ -687,11 +691,41 @@ public class ExpressionCalculator implements ActionListener, Calculator {
 				+ ""
 				+ "\\d\\+\\-\\*\\/\\^r\\(\\)\\s]"))
 		{
-			msg = "You entered an illegal character";
+			msg = "You entered an illegal character.";
 		}
-		else if (expr.contains(")"))
-		{
-			msg = "Unmatched parentheses";
+		else if ((expr.contains(")")))
+		{	
+			int rightCount = 0;
+			int leftCount = 0;
+			int offSet = 0;
+			int i = 0;
+		
+			//System.out.println("Here!");
+			//System.out.println(expr);
+			//msg = "Unmatched parentheses.";
+			
+				
+					while (i < expr.length())
+					{
+						//System.out.println("evaling " + expr.charAt(offSet));
+						if(expr.charAt(offSet) == '(')
+						{
+							leftCount++;
+						}
+						if(expr.charAt(offSet) == ')')
+						{
+							//System.out.println("Found right, offS is " + offSet);
+							rightCount++;
+						}
+						offSet++;
+						i++;
+					}
+				
+				if (leftCount != rightCount)
+				{
+					//System.out.println("Found unmatched parens");
+					msg = "Unmatched parentheses.";
+				}
 		}
 		else if (expr.matches("^[\\d\\s]+$"))
 		{
