@@ -405,10 +405,12 @@ public class ExpressionCalculator implements ActionListener, Calculator {
 			return String.valueOf(evalExpr(Expression));
 		}
 		catch(IllegalArgumentException iae){
+			System.out.println(iae.getMessage());
 			throw iae;
 		}
 		catch(StringIndexOutOfBoundsException sioobe){
-			throw new IllegalArgumentException("Expression is invalid, please make sure all parentheses are closed.");
+			//throw new IllegalArgumentException("Expression is invalid, please make sure all parentheses are closed.");
+			throw new IllegalArgumentException("Expression is invalid, please check operators.");
 		}
 		
 	}
@@ -431,19 +433,26 @@ public class ExpressionCalculator implements ActionListener, Calculator {
 			{
 				rightCount = 0;
 				leftCount = 1;
-				while (leftCount != rightCount)
+				try
 				{
-					offSet++;
-					i++;
-					if(expr.charAt(offSet) == '(')
+					while (leftCount != rightCount)
 					{
-						leftCount++;
+						offSet++;
+						i++;
+						if(expr.charAt(offSet) == '(')
+						{
+							leftCount++;
+						}
+						if(expr.charAt(offSet) == ')')
+						{
+							//System.out.println("Found right, offS is " + offSet);
+							rightCount++;
+						}
 					}
-					if(expr.charAt(offSet) == ')')
-					{
-						//System.out.println("Found right, offS is " + offSet);
-						rightCount++;
-					}
+				}
+				catch (StringIndexOutOfBoundsException e)
+				{
+					throw new IllegalArgumentException("Unmatched Parentheses");
 				}
 			}
 			if ((expr.charAt(offSet)==splitOn))
@@ -488,6 +497,8 @@ public class ExpressionCalculator implements ActionListener, Calculator {
 			//handle unary neg
 			if ((expr.substring(oldOffSet+1, offSet).length()==0) && (splitOn == '-'))
 			{
+				//This print actually produces an exception we want
+				System.out.println(expr.charAt(oldOffSet+1));
 				//System.out.println("Handling unary neg");
 				toAdd.add("0");
 				osAdd = 0;
@@ -565,7 +576,7 @@ public class ExpressionCalculator implements ActionListener, Calculator {
 		
 			try
 			{
-				//System.out.println(expr);
+				//System.out.println("Trying Double parse");
 				if (expr.indexOf("^")!= -1)
 				{
 					throw new NumberFormatException("Found exp");
@@ -664,13 +675,29 @@ public class ExpressionCalculator implements ActionListener, Calculator {
 				//Parentheses----------------------------
 				if (expr.indexOf("(") == 0)
 				{
-					//System.out.println("Detected Parens");
+					
 					return evalExpr(expr.substring(1, expr.length()-1));
+					
 				}
 				//---------------------------------------
 			}
-			
-		throw new IllegalArgumentException("The expression passed was not valid, please make sure there are no missing operands or operators.");
+		
+		String msg = "The expression passed was not valid, please check your operators.";
+		if (expr.matches("[^x"
+				+ ""
+				+ "\\d\\+\\-\\*\\/\\^r\\(\\)\\s]"))
+		{
+			msg = "You entered an illegal character";
+		}
+		else if (expr.contains(")"))
+		{
+			msg = "Unmatched parentheses";
+		}
+		else if (expr.matches("^[\\d\\s]+$"))
+		{
+			msg = "No whitespace between numbers, please.  Check your input.";
+		}
+		throw new IllegalArgumentException(msg);
 		//return -666;
 	}
 	//-------------------------------------------------------------------------------//
