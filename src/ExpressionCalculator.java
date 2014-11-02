@@ -1,3 +1,5 @@
+//Joseph Jarriel, Adam Dorenfeld, Kyle Robbins
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Frame;
