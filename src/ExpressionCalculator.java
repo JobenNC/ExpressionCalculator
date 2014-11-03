@@ -217,8 +217,13 @@ public class ExpressionCalculator implements ActionListener, Calculator {
 				String enteredExpression = expTextField.getText();
 				String result			 = calculate(enteredExpression, forxTextField.getText());
 				
-				enteredExpression = enteredExpression.replace("x", enteredX);
-				logTextArea.append(newLine + enteredExpression + " = " + result);
+				//enteredExpression = enteredExpression.replace("x", enteredX);
+				//logTextArea.append(newLine + enteredExpression + " = " + result);
+				if(!enteredExpression.contains("x"))
+					logTextArea.append(newLine + enteredExpression + " = " + result);
+				else{
+					logTextArea.append(newLine + enteredExpression + " = " + result + " for x = " + enteredX);
+				}
 				// Scroll log all the way to the bottom.  
 			    logTextArea.setCaretPosition(logTextArea.getDocument().getLength());
 				
