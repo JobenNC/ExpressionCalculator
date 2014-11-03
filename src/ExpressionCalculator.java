@@ -211,6 +211,7 @@ public class ExpressionCalculator implements ActionListener, Calculator {
 		//When inputting expression
 		if(ae.getSource() == expTextField || ae.getSource() == forxTextField){
 			try {
+				resultTextField.setText("");
 				//attempt to accumulate
 				String enteredX 		 = forxTextField.getText();
 				String enteredExpression = expTextField.getText();
